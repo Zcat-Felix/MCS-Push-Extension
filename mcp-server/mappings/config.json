@@ -1,0 +1,27 @@
+{
+  "max_tasks": 5,
+  "llm": {
+    "api_url": "https://v2.aicodee.com/v1/chat/completions",
+    "api_key": "sk-0d9112932aa68eebb137722ee8e3882b",
+    "model_id": "MiniMax-M2.7-highspeed"
+  },
+  "python": "python",
+  "browsers": [
+    {
+      "name": "Edge",
+      "cdp_port": 9222,
+      "auto_scan": true,
+      "scan_ports": [9222, 9229, 9230],
+      "inspect_url": "edge://inspect",
+      "path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe"
+    },
+    {
+      "name": "Chrome",
+      "cdp_port": 49727,
+      "auto_scan": true,
+      "scan_ports": [49727, 9222, 9229, 9230],
+      "inspect_url": "chrome://inspect/#devices",
+      "path": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    }
+  ]
+}

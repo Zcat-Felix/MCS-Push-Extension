@@ -1,0 +1,334 @@
+{
+  "_note": "美团类目属性映射 v2.0 — 两层结构: L1子类目路由 + L2字段映射",
+  "_version": "2.0",
+  "_shared": {
+    "能效等级": {
+      "source_key": "能效等级",
+      "field_type": "select",
+      "value_map": {
+        "1级": "1级",
+        "2级": "2级",
+        "3级": "3级",
+        "4级": "4级",
+        "5级": "5级",
+        "一级": "1级",
+        "二级": "2级",
+        "三级": "3级",
+        "四级": "4级",
+        "五级": "5级"
+      },
+      "default": "2级"
+    },
+    "型号": {
+      "source_key": "商品型号",
+      "field_type": "text"
+    },
+    "生产者（制造商）名称": {
+      "source_key": "品牌名称",
+      "field_type": "text"
+    }
+  },
+  "categories": {
+    "电热水器": {
+      "sub_category_field": "商品类别",
+      "default_sub": "电热水器",
+      "subcategories": {
+        "电热水器": {
+          "mappings": [
+            {
+              "source_key": "热水器类型",
+              "form_label": "类型",
+              "field_type": "select",
+              "value_map": {
+                "密闭式储水式": "储水式"
+              },
+              "default": "储水式"
+            },
+            {
+              "source_key": "控制方式",
+              "form_label": "操控方式",
+              "field_type": "select",
+              "value_map": {
+                "数显": "触控式",
+                "机械": "机械式"
+              },
+              "default": "触控式"
+            },
+            {
+              "source_key": "产品款式",
+              "form_label": "外观设计",
+              "field_type": "select",
+              "value_map": {
+                "横式": "圆筒型",
+                "竖式": "扁桶型"
+              },
+              "default": "圆筒型"
+            },
+            {
+              "source_key": "容积（L）",
+              "form_label": "容量",
+              "field_type": "structured",
+              "unit_map": {
+                "L": "L",
+                "升": "L",
+                "l": "L"
+              }
+            },
+            {
+              "source_key": "热水器类型",
+              "form_label": "出水方式",
+              "field_type": "select",
+              "value_map": {
+                "储水式电热水器": "储水式",
+                "即热式电热水器": "即热式",
+                "敞开式": "敞开式"
+              },
+              "default": "储水式"
+            },
+            {
+              "source_key": "热水器类型",
+              "form_label": "商品类别",
+              "field_type": "select",
+              "value_map": {
+                "电热水器": "电热水器",
+                "储热式": "电热水器",
+                "即热式": "电热水器",
+                "厨宝": "厨宝"
+              },
+              "default": "电热水器"
+            },
+            {
+              "source_key": "智能类型",
+              "form_label": "特征特质",
+              "field_type": "select",
+              "value_map": {
+                "其他": "wifi连接"
+              },
+              "default": "wifi连接"
+            }
+          ]
+        },
+        "厨宝": {
+          "mappings": [
+            {
+              "source_key": "控制方式",
+              "form_label": "操控方式",
+              "field_type": "select",
+              "value_map": {
+                "数显": "触控式",
+                "机械": "机械式"
+              },
+              "default": "触控式"
+            }
+          ]
+        }
+      }
+    },
+    "洗衣机": {
+      "sub_category_field": "商品类别",
+      "default_sub": "波轮",
+      "subcategories": {
+        "波轮": {
+          "mappings": [
+            {
+              "source_key": "变频/定频",
+              "form_label": "变频/定频",
+              "field_type": "select",
+              "value_map": {
+                "变频": "变频",
+                "定频": "定频"
+              },
+              "default": "定频"
+            },
+            {
+              "source_key": "排水方式",
+              "form_label": "排水方式",
+              "field_type": "select",
+              "value_map": {
+                "上排水": "下排水",
+                "下排水": "下排水"
+              },
+              "default": "下排水"
+            },
+            {
+              "source_key": "抗菌类型",
+              "form_label": "抗菌类型",
+              "field_type": "select",
+              "value_map": {
+                "高温": "高温除菌"
+              },
+              "default": "高温除菌"
+            },
+            {
+              "source_key": "机身尺寸（mm）",
+              "form_label": "宽度（cm）",
+              "field_type": "text",
+              "transform": "dim:0"
+            },
+            {
+              "source_key": "机身尺寸（mm）",
+              "form_label": "高度（cm）",
+              "field_type": "text",
+              "transform": "dim:2"
+            },
+            {
+              "source_key": "包装尺寸（mm）",
+              "form_label": "包装尺寸（长x宽x高mm）",
+              "field_type": "text"
+            },
+            {
+              "source_key": "机身尺寸（mm）",
+              "form_label": "深度（cm）",
+              "field_type": "text",
+              "transform": "dim:1"
+            }
+          ]
+        }
+      }
+    },
+    "电磁炉": {
+      "sub_category_field": "",
+      "default_sub": "",
+      "subcategories": {
+        "": {
+          "mappings": [
+            {
+              "source_key": "电源线长",
+              "form_label": "电源线长（m）",
+              "field_type": "text"
+            }
+          ]
+        }
+      }
+    },
+    "灶具": {
+      "sub_category_field": "",
+      "default_sub": "",
+      "subcategories": {
+        "": {
+          "mappings": [
+            {
+              "source_key": "能力名称",
+              "form_label": "火力大小（KW）",
+              "field_type": "text"
+            },
+            {
+              "source_key": "灶眼数量（个）",
+              "form_label": "灶眼数量",
+              "field_type": "select",
+              "value_map": {
+                "2": "双眼"
+              },
+              "default": "双眼"
+            },
+            {
+              "source_key": "面板材质",
+              "form_label": "面板材质",
+              "field_type": "select",
+              "value_map": {
+                "钢化玻璃": "钢化玻璃"
+              },
+              "default": "钢化玻璃"
+            },
+            {
+              "source_key": "适用气源",
+              "form_label": "气源",
+              "field_type": "select",
+              "value_map": {
+                "天然气": "天然气(12T)"
+              },
+              "default": "天然气(12T)"
+            },
+            {
+              "source_key": "童锁",
+              "form_label": "功能",
+              "field_type": "select",
+              "value_map": {
+                "支持": "童锁保护"
+              },
+              "default": "童锁保护"
+            },
+            {
+              "source_key": "开孔（长宽mm）",
+              "form_label": "灶台挖孔长度",
+              "field_type": "structured"
+            },
+            {
+              "source_key": "安装方式",
+              "form_label": "安装方式",
+              "field_type": "select",
+              "value_map": {
+                "台嵌两用": "嵌入式"
+              },
+              "default": "嵌入式"
+            }
+          ]
+        }
+      }
+    },
+    "电动绞肉机": {
+      "sub_category_field": "",
+      "default_sub": "",
+      "subcategories": {
+        "": {
+          "mappings": [
+            {
+              "source_key": "净重（Kg）",
+              "form_label": "产品净重（kg）",
+              "field_type": "text"
+            },
+            {
+              "source_key": "电源频率",
+              "form_label": "额定频率（HZ）",
+              "field_type": "text"
+            },
+            {
+              "source_key": "机身尺寸（mm）",
+              "form_label": "商品尺寸（长x宽x高mm）",
+              "field_type": "text"
+            },
+            {
+              "source_key": "控制方式",
+              "form_label": "操控方式",
+              "field_type": "select",
+              "value_map": {
+                "机械": "旋钮式"
+              },
+              "default": "旋钮式"
+            },
+            {
+              "source_key": "电源电压",
+              "form_label": "额定电压",
+              "field_type": "structured"
+            }
+          ]
+        }
+      }
+    },
+    "家用制冰机": {
+      "sub_category_field": "",
+      "default_sub": "",
+      "subcategories": {
+        "": {
+          "mappings": [
+            {
+              "source_key": "电源电压",
+              "form_label": "额定电压",
+              "field_type": "structured"
+            },
+            {
+              "source_key": "能力数值",
+              "form_label": "水箱容量（L）",
+              "field_type": "structured"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "_unmapped_strategy": {
+    "action": "write_pending",
+    "pending_type": "attr_mapping",
+    "description": "未匹配的属性字段写入 pending_mappings.json 由 LLM 后台解析后合并回本文件对应 subcategory"
+  }
+}

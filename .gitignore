@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.coverage
+.cache/
+
+# Node
+node_modules/
+package-lock.json
+
+# Runtime / Build
+_runtime/
+cache/
+tasks/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Debug / Test artifacts (keep source test scripts, exclude temp outputs)
+*.png
+*.zip
+*.log
+
+# Config with secrets
+.env
+.local
+*.key
+
+# Coverage
+htmlcov/
+.coverage*

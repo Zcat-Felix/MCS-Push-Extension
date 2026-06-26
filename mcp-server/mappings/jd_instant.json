@@ -1,0 +1,72 @@
+{
+  "_note": "类目LLM智能选择 + 品牌clickXY, 校内分类: 待解决",
+  "_generated": "2026-06-13T15:54:00",
+
+  "text_fields": [
+    {
+      "label": "商品名称",
+      "selector": "placeholder:50字",
+      "source": "product.name",
+      "max_len": 50
+    },
+    {
+      "label": "商品类目",
+      "type": "category",
+      "source": "product.name"
+    },
+    {
+      "label": "商品品牌",
+      "type": "brand",
+      "source": "params.品牌名称",
+      "input_idx": 3,
+      "verify_idx": 2
+    },
+    {
+      "label": "商家SKU编码",
+      "selector": "index:18",
+      "source": "params.商品编码"
+    },
+    {
+      "label": "商品条形码(UPC)",
+      "selector": "index:19",
+      "source": "params.商品条码"
+    },
+    {
+      "label": "毛重(Kg)",
+      "selector": "index:15",
+      "source": "params_sum:毛重",
+      "_note": "求和所有含'毛重'的param数值(如空调内机毛重+外机毛重)"
+    }
+  ],
+
+  "image_fields": [
+    {
+      "label": "商品图片",
+      "selector": ".pro-image-ms input[type=\"file\"]",
+      "trigger_selector": ".pro-image-ms .dj-upload-upload-btn",
+      "source": "images_mainThumb",
+      "max": 10,
+      "type": "form_set",
+      "form_field": "materialList"
+    },
+    {
+      "label": "图文详情",
+      "selector": ".w-e-text",
+      "source": "images_detail",
+      "max": 50,
+      "type": "wang_editor"
+    }
+  ],
+
+  "skip_fields": [
+    "店内分类",
+    "商家SPU编码",
+    "商品视频",
+    "单点不送",
+    "无理由标签",
+    "特殊属性(运输方式/易碎/液体/处方药/高单值/赠品/上门服务/加工服务)",
+    "可售时间"
+  ],
+
+  "target_url": "https://store.jddj.com/v3/product/instantPublish?pageSource=5"
+}

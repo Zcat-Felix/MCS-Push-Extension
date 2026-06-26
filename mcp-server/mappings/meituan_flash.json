@@ -1,0 +1,61 @@
+{
+  "_note": "美团闪购商品发布表单映射 — Phase 3 done, Phase 4 in progress",
+  "_generated": "2026-06-16T15:00:00",
+
+  "text_fields": [
+    {
+      "label": "商品名称",
+      "selector": "placeholder:规范命名有利于顾客选购",
+      "source": "product.name",
+      "max_len": 45,
+      "post_actions": [
+        {"type": "wait_meituan_category", "timeout": 3, "poll": 0.3}
+      ]
+    }
+  ],
+
+  "table_fields": [
+    {
+      "label": "规格信息",
+      "columns": [
+        {"label": "条形码", "col": 0, "source": "params.商品条码"},
+        {"label": "毛重", "col": 3, "source": "params_sum:毛重", "unit": "千克(kg)"},
+        {"label": "店内码/货号", "col": 4, "source": "params.商品编码"}
+      ]
+    }
+  ],
+
+  "select_fields": [
+    {
+      "label": "店内分类",
+      "component": "boo-select",
+      "source": "keywords_from_category"
+    }
+  ],
+
+  "image_fields": [
+    {
+      "label": "商品图片",
+      "source": "images_mainThumb",
+      "max": 10
+    },
+    {
+      "label": "图片详情",
+      "type": "detail",
+      "source": "images_detail",
+      "max": 40
+    }
+  ],
+
+  "skip_fields": [
+    "商品卖点",
+    "文字详情",
+    "卖点展示期",
+    "封面视频",
+    "封面视频封面",
+    "无理由退货",
+    "关联门店",
+    "起购数",
+    "货架码/位置"
+  ]
+}

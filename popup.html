@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美云销图片下载器</title>
+    <style>
+        /* ========================================
+           设计系统：自然韵律 (Natural Rhythm)
+           暖白底色 · 森林绿主色 · 克制的间距节奏
+           ======================================== */
+        :root {
+            --bg:            #faf9f6;
+            --surface:       #ffffff;
+            --primary:       #2d6a4f;
+            --primary-hover: #1b4332;
+            --primary-light: #f0fdf4;
+            --text:          #1f2937;
+            --text-secondary:#6b7280;
+            --text-muted:    #9ca3af;
+            --border:        #e5e7eb;
+            --border-light:  #f3f4f6;
+            --success-bg:    #ecfdf5;
+            --success-text:  #065f46;
+            --error-bg:      #fef2f2;
+            --error-text:    #991b1b;
+            --info-bg:       #eff6ff;
+            --info-text:     #1e40af;
+            --shadow-sm:     0 1px 2px rgba(0,0,0,0.04);
+            --shadow:        0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md:     0 4px 12px rgba(0,0,0,0.06);
+            --radius:        10px;
+            --radius-sm:     8px;
+            --font:          system-ui, -apple-system, "Segoe UI", "PingFang SC",
+                             "Microsoft YaHei", sans-serif;
+            --font-mono:     "SF Mono", "Cascadia Code", Consolas, monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            width: 400px;
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container { padding: 24px 20px 20px; }
+
+        /* ---- 头部 ---- */
+        .header { margin-bottom: 20px; }
+        .header h1 {
+            font-size: 18px;
+            font-weight: 650;
+            color: var(--text);
+            letter-spacing: -0.01em;
+            line-height: 1.3;
+        }
+        .header .tagline {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        /* ---- 状态条 ---- */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 12px;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            background: var(--text-muted);
+            transition: background 0.3s;
+        }
+        .status-dot.on  { background: #22c55e; }
+        .status-dot.off { background: #ef4444; }
+        .status-text { flex:1; color: var(--text-secondary); }
+        .status-text em {
+            font-style: normal;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        /* ---- 当前页面 URL ---- */
+        .url-display {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            margin-bottom: 14px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            word-break: break-all;
+            line-height: 1.5;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        /* ---- 统计卡片 ---- */
+        .stats-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .stat-item {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 14px 10px;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .stat-item:hover {
+            border-color: var(--border);
+            box-shadow: var(--shadow);
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 650;
+            color: var(--text);
+            line-height: 1;
+            letter-spacing: -0.02em;
+            transition: color 0.2s;
+        }
+        .stat-value.zero { color: var(--text-muted); }
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+        }
+
+        /* ---- 消息提示 ---- */
+        .message {
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            margin-bottom: 12px;
+            display: none;
+            line-height: 1.5;
+            animation: msgIn 0.2s ease;
+        }
+        @keyframes msgIn { from { opacity:0; transform:translateY(-4px); } }
+        .message.error   { display:block; background:var(--error-bg);   color:var(--error-text);   }
+        .message.success { display:block; background:var(--success-bg); color:var(--success-text); }
+        .message.info    { display:block; background:var(--info-bg);    color:var(--info-text);    }
+
+        /* ---- 按钮 ---- */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            padding: 11px 16px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 530;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+            width: 100%;
+            position: relative;
+        }
+        .btn:active:not(:disabled) { transform: scale(0.98); }
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .btn .btn-icon {
+            font-size: 16px;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background: var(--primary-hover);
+            box-shadow: 0 2px 8px rgba(45,106,79,0.22);
+        }
+
+        .btn-outline {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover:not(:disabled) {
+            background: var(--border-light);
+            border-color: var(--text-muted);
+        }
+
+        /* ---- 加载区 ---- */
+        .loading-area {
+            text-align: center;
+            padding: 12px 0 16px;
+            display: none;
+        }
+        .spinner {
+            width: 30px; height: 30px;
+            border: 3px solid var(--border-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { font-size: 13px; color: var(--text-secondary); }
+        .progress-track {
+            width: 100%; height: 4px;
+            background: var(--border-light);
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.2s ease;
+            border-radius: 2px;
+        }
+
+        /* ---- 设置 ---- */
+        .settings-trigger {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 8px 4px 8px 0;
+            font-size: 13px;
+            color: var(--text-muted);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: var(--font);
+            transition: color 0.15s;
+        }
+        .settings-trigger:hover { color: var(--text-secondary); }
+        .settings-trigger .arrow {
+            transition: transform 0.2s;
+            font-size: 10px;
+            opacity: 0.6;
+        }
+        .settings-trigger.open .arrow { transform: rotate(180deg); }
+
+        .settings-panel {
+            display: none;
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+        }
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 0;
+        }
+        .setting-row + .setting-row { border-top: 1px solid var(--border-light); }
+        .setting-label {
+            font-size: 13px;
+            color: var(--text);
+            font-weight: 500;
+        }
+        .setting-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 1px;
+            font-weight: 400;
+        }
+
+        /* Toggle */
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 44px; height: 24px;
+            flex-shrink: 0;
+        }
+        .toggle input { opacity:0; width:0; height:0; }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top:0; left:0; right:0; bottom:0;
+            background: var(--border);
+            transition: 0.2s;
+            border-radius: 24px;
+        }
+        .toggle-slider::before {
+            content: "";
+            position: absolute;
+            height: 18px; width: 18px;
+            left: 3px; bottom: 3px;
+            background: #fff;
+            transition: 0.2s;
+            border-radius: 50%;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+        }
+        input:checked + .toggle-slider { background: var(--primary); }
+        input:checked + .toggle-slider::before { transform: translateX(20px); }
+
+        /* ---- 底部 ---- */
+        .footer {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- 头部 -->
+    <div class="header">
+        <h1>美云销图片下载器</h1>
+        <p class="tagline">商品图片与参数，一键收集</p>
+    </div>
+
+    <!-- 页面状态 -->
+    <div class="status-bar">
+        <div class="status-dot" id="statusDot"></div>
+        <div class="status-text" id="pageStatus">检测页面中…</div>
+    </div>
+
+    <!-- 当前 URL -->
+    <div class="url-display" id="currentUrl">—</div>
+
+    <!-- 图片统计 -->
+    <div class="stats-row">
+        <div class="stat-item">
+            <div class="stat-value zero" id="mainCount">0</div>
+            <div class="stat-label">主图</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value zero" id="thumbCount">0</div>
+            <div class="stat-label">副图</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value zero" id="detailCount">0</div>
+            <div class="stat-label">详情图</div>
+        </div>
+    </div>
+
+    <!-- 消息 -->
+    <div class="message error"   id="errorMessage"></div>
+    <div class="message success" id="successMessage"></div>
+
+    <!-- 加载 -->
+    <div class="loading-area" id="loadingArea">
+        <div class="spinner"></div>
+        <div class="loading-text">正在处理…</div>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="btn-group" id="btnGroup">
+        <button class="btn btn-primary" id="scanBtn">
+            <span class="btn-icon">⊙</span>扫描图片
+        </button>
+        <button class="btn btn-primary" id="downloadBtn" disabled>
+            <span class="btn-icon">↓</span>下载图片
+        </button>
+        <button class="btn btn-outline" id="exportParamsBtn">
+            <span class="btn-icon">⏏</span>导出商品参数
+        </button>
+    </div>
+
+    <!-- 设置 -->
+    <button class="settings-trigger" id="settingsTrigger">
+        设置选项 <span class="arrow">▾</span>
+    </button>
+    <div class="settings-panel" id="settingsPanel">
+        <div class="setting-row">
+            <div>
+                <div class="setting-label">获取高清原图</div>
+                <div class="setting-hint">自动请求最高分辨率版本</div>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="autoHighQuality" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        <div class="setting-row">
+            <div>
+                <div class="setting-label">按类型分文件夹</div>
+                <div class="setting-hint">主副图、详情图分开存放</div>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="categorizeFolders" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        <div class="setting-row">
+            <div>
+                <div class="setting-label">显示下载进度</div>
+                <div class="setting-hint">打包时展示实时进度</div>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="showProgress" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer">v3.2 &middot; made by Marvis</div>
+
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>

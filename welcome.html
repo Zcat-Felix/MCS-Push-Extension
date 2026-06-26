@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美云销图片下载器 · 欢迎</title>
+    <style>
+        /* ========================================
+           自然韵律 (Natural Rhythm) — 欢迎页面
+           暖白底色 · 森林绿主色 · 放松的阅读节奏
+           ======================================== */
+        :root {
+            --bg:            #faf9f6;
+            --surface:       #ffffff;
+            --primary:       #2d6a4f;
+            --primary-light: #f0fdf4;
+            --text:          #1f2937;
+            --text-secondary:#6b7280;
+            --text-muted:    #9ca3af;
+            --border:        #e5e7eb;
+            --border-light:  #f3f4f6;
+            --shadow:        0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md:     0 4px 12px rgba(0,0,0,0.06);
+            --radius:        12px;
+            --radius-sm:     8px;
+            --font:          system-ui, -apple-system, "Segoe UI", "PingFang SC",
+                             "Microsoft YaHei", sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            color: var(--text);
+            padding: 40px 20px 60px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 44px 48px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border);
+            max-width: 860px;
+            width: 100%;
+        }
+
+        /* ---- 头部 ---- */
+        .header {
+            text-align: center;
+            margin-bottom: 44px;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 650;
+            color: var(--text);
+            letter-spacing: -0.015em;
+            margin-bottom: 10px;
+        }
+        .header .tagline {
+            font-size: 15px;
+            color: var(--text-secondary);
+            max-width: 480px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* ---- 功能介绍 ---- */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 40px;
+        }
+        .feature-card {
+            background: var(--surface);
+            padding: 22px 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            text-align: center;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .feature-card:hover {
+            border-color: var(--border);
+            box-shadow: var(--shadow);
+        }
+        .feature-dot {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            margin: 0 auto 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        .feature-dot.scan   { background: #f0fdf4; color: #2d6a4f; }
+        .feature-dot.pack   { background: #eff6ff; color: #1e40af; }
+        .feature-dot.sort   { background: #fefce8; color: #854d0e; }
+        .feature-dot.save   { background: #faf5ff; color: #6b21a8; }
+        .feature-dot.float  { background: #fff7ed; color: #9a3412; }
+        .feature-dot.prog   { background: #ecfdf5; color: #065f46; }
+        .feature-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 6px;
+        }
+        .feature-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ---- 使用指南 ---- */
+        .guide-section {
+            background: var(--primary-light);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            margin-bottom: 28px;
+            border: 1px solid #d1fae5;
+        }
+        .guide-section h2 {
+            font-size: 18px;
+            font-weight: 650;
+            color: var(--text);
+            margin-bottom: 18px;
+            text-align: center;
+        }
+        .step {
+            display: flex;
+            gap: 14px;
+            padding: 14px 0;
+        }
+        .step + .step { border-top: 1px solid #d1fae5; }
+        .step-num {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            font-size: 13px;
+            font-weight: 650;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .step-body { flex: 1; }
+        .step-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+        .step-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ---- 提示 ---- */
+        .tips {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 20px 24px;
+            margin-bottom: 28px;
+        }
+        .tips h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        .tips ul {
+            list-style: none;
+            padding: 0;
+        }
+        .tips li {
+            padding: 6px 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.6;
+        }
+        .tips li::before {
+            content: "—";
+            flex-shrink: 0;
+            color: var(--text-muted);
+        }
+
+        /* ---- 底部 ---- */
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-muted);
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        @media (max-width: 640px) {
+            .features {
+                grid-template-columns: 1fr 1fr;
+            }
+            .container {
+                padding: 32px 20px;
+            }
+            .guide-section {
+                padding: 20px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- 头部 -->
+    <div class="header">
+        <h1>美云销图片下载器</h1>
+        <p class="tagline">打开美云销商品页面，点击图标即可收集全部商品图片和参数 — 自动分类、高清原图、一键打包。</p>
+    </div>
+
+    <!-- 功能卡片 -->
+    <div class="features">
+        <div class="feature-card">
+            <div class="feature-dot scan">⊙</div>
+            <div class="feature-title">智能识别</div>
+            <div class="feature-desc">自动区分主图、副图、详情图，无需手动筛选</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-dot pack">⊞</div>
+            <div class="feature-title">一键打包</div>
+            <div class="feature-desc">所有图片打包为 ZIP，直接保存到下载目录</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-dot sort">⊟</div>
+            <div class="feature-title">分类存储</div>
+            <div class="feature-desc">主副图和详情图分别归档，结构一目了然</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-dot save">⏏</div>
+            <div class="feature-title">参数导出</div>
+            <div class="feature-desc">提取商品规格参数，导出为 JSON 文件</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-dot float">＋</div>
+            <div class="feature-title">悬浮按钮</div>
+            <div class="feature-desc">页面右下角常驻操作入口，随时可用</div>
+        </div>
+        <div class="feature-card">
+            <div class="feature-dot prog">↻</div>
+            <div class="feature-title">实时进度</div>
+            <div class="feature-desc">打包进度清晰可见，过程不黑盒</div>
+        </div>
+    </div>
+
+    <!-- 使用指南 -->
+    <div class="guide-section">
+        <h2>快速上手</h2>
+        <div class="step">
+            <span class="step-num">1</span>
+            <div class="step-body">
+                <div class="step-title">打开美云销商品详情页</div>
+                <div class="step-desc">支持新旧域名：sales-expedite-ga.midea.com 和 dsdcp.smartmidea.net</div>
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-num">2</span>
+            <div class="step-body">
+                <div class="step-title">点击扩展图标或右下角悬浮按钮</div>
+                <div class="step-desc">弹窗会自动检测当前页面，显示能收集到的图片和参数</div>
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-num">3</span>
+            <div class="step-body">
+                <div class="step-title">点击「扫描图片」确认数量</div>
+                <div class="step-desc">如需重新扫描可随时点击，图片数量会实时更新</div>
+            </div>
+        </div>
+        <div class="step">
+            <span class="step-num">4</span>
+            <div class="step-body">
+                <div class="step-title">点击「下载图片」或「导出参数」</div>
+                <div class="step-desc">ZIP 或 JSON 文件直接保存到浏览器默认下载目录</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 使用技巧 -->
+    <div class="tips">
+        <h3>实用建议</h3>
+        <ul>
+            <li>默认设置适合大多数场景，无需修改即可正常使用</li>
+            <li>可关闭「按类型分文件夹」，所有图片将存到同一目录</li>
+            <li>页面图片未正常识别时，刷新页面后重新扫描即可</li>
+            <li>请确保已登录美云销，否则可能无法获取完整数据</li>
+        </ul>
+    </div>
+
+    <!-- 底部 -->
+    <div class="footer">v3.2 &middot; made by Marvis</div>
+
+</div>
+</body>
+</html>
