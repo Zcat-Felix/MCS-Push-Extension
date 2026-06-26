@@ -298,6 +298,7 @@ def resolve_attr_mapping(item, dry_run):
 
     # ═══ 步骤1 LLM: 属性名匹配 (source_keys → source_key) ═══
     # 传入子选项值作上下文(both select_opts + params), 但只输出 source_key
+    capability_groups = item.get('capability_groups', [])
     prompt1 = (
         f"任务: 匹配美云销字段名到美团表单字段。\n\n"
         f"商品类目: {category}\n商品名称: {product_name}\n"
@@ -305,6 +306,10 @@ def resolve_attr_mapping(item, dry_run):
         f"美云销可用字段名: {json.dumps(source_keys, ensure_ascii=False)}\n"
         f"美云销各字段取值: {json.dumps(params, ensure_ascii=False) if params else '(无)'}\n"
     )
+    if capability_groups:
+        prompt1 += (f"⚠️ 注意: 以下能力参数是分组的(能力名称/数值/单位属于同一组), "
+                    f"勿选能力名称作为 source_key, 正确应选能力数值:\n"
+                    f"{json.dumps(capability_groups, ensure_ascii=False)}\n")
     if select_opts:
         prompt1 += f"美团该字段可选值: {json.dumps(select_opts, ensure_ascii=False)}\n"
     prompt1 += (

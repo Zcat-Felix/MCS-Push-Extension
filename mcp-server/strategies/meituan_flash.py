@@ -176,30 +176,19 @@ def fill_form(task_file, dry_run=False, skip_nav=False):
         else: failed.append(f['label'])
         results.append(msg)
 
-    # ===== Phase 6: 图片上传 =====
-    uploaded_main_urls = []  # v3.3: 记住上传的 CDN URLs, 供 Post-sync 恢复
+    # ===== Phase 6: 图片上传 (主图暂禁用, 详情图正常) =====
+    uploaded_main_urls = []
     for f in mapping.get('image_fields', []):
         if f.get('type') == 'detail':
             status, msg = _fill_detail_images(target_id, f, task)
+            if status == 'filled': filled.append(f['label'])
+            elif status == 'skipped': skipped.append(f['label'])
+            else: failed.append(f['label'])
+            results.append(msg)
         else:
-            status, msg = _fill_images(target_id, f, task)
-        if status == 'filled': filled.append(f['label'])
-        elif status == 'skipped': skipped.append(f['label'])
-        else: failed.append(f['label'])
-        results.append(msg)
-        # 提取上传成功的 URL (从 msg 中解析 "N/10张 ✓" 格式无法提取, 改用 VM 层读取)
-        if status == 'filled' and f.get('type') != 'detail':
-            # 从父组件读取刚写好的 value
-            try:
-                urls_raw = _raw_iframe_eval(target_id,
-                    "var pc=document.querySelector('.product-picture-container');"
-                    "if(!pc)return'[]';"
-                    "var pp=pc;while(pp&&!pp.__vue__)pp=pp.parentElement;"
-                    "if(pp&&pp.__vue__){return JSON.stringify(pp.__vue__.value.map(function(v){return v.src}))}"
-                    "return'[]'")
-                uploaded_main_urls = json.loads(urls_raw) if urls_raw else []
-            except:
-                pass
+            skipped.append(f['label'])
+            results.append(f"  [{f['label']}] skipped (main image upload disabled)")
+            print(f"  [{f['label']}] ⏭️ 主图上传已禁用, 跳过", file=sys.stderr)
 
     # ===== 兜底: 轮询 undo 按钮 =====
     if not category_clicked:
@@ -672,6 +661,27 @@ def _fill_attributes(target, task):
     # ── 2. 构建源数据 ──
     params = task.get('product', {}).get('params', [])
     param_map = {p['key']: p['value'] for p in params}
+    
+    # 识别能力列表分组: 将 能力名称/能力数值/能力单位 按出现的顺序分组
+    # 避免 flat dict 中多组能力被覆盖
+    capability_groups = []
+    _cg = {}
+    for p in params:
+        k = p.get('key', '')
+        v = p.get('value', '')
+        if k == '能力名称':
+            if _cg:
+                capability_groups.append(_cg)
+            _cg = {'name': v}
+        elif k == '能力数值' and _cg:
+            _cg['value'] = v
+        elif k == '能力单位' and _cg:
+            _cg['unit'] = v
+    if _cg:
+        capability_groups.append(_cg)
+    if capability_groups:
+        print(f"  [商品属性] 能力分组: {json.dumps(capability_groups, ensure_ascii=False)}", file=sys.stderr)
+    
     name = task.get('product', {}).get('name', '')
     if name:
         m = re.search(r'[A-Z]+[\d\-]+[A-Z]*', name)
@@ -760,6 +770,13 @@ def _fill_attributes(target, task):
                 f"var matchedIdx=-1;"
                 f"for(var k=0;k<src.length;k++){{"
                 f"if(src[k].name===defv){{matchedIdx=k;break;}}}}"
+                f"if(matchedIdx<0){{"
+                f"var _gn=function(s){{var m=s.match(/[0-9]+/);if(m)return m[0];"
+                f"var cn={{'一':'1','二':'2','三':'3','四':'4','五':'5'}};"
+                f"for(var k in cn){{if(s.indexOf(k)>=0)return cn[k];}}return'';}};"
+                f"var tn=_gn(defv);if(tn){{"
+                f"for(var k=0;k<src.length;k++){{if(_gn(src[k].name||'')===tn){{matchedIdx=k;break;}}}}"
+                f"}}}}"
                 f"if(matchedIdx<0)return'NO_MATCH';"
                 f"var input=sel.closest('.form-item-layout').querySelector('input');"
                 f"if(!input)return'NI';"
@@ -870,14 +887,15 @@ def _fill_attributes(target, task):
 
     # ── 3. 写入 pending ──
     if unmatched and category_name:
-        _write_pending_attr(category_name, sub_category_name, unmatched, param_map, name)
+        _write_pending_attr(category_name, sub_category_name, unmatched, param_map, name,
+                            capability_groups=capability_groups)
 
     if filled_count > 0:
         return ("filled", f"attribute: {filled_count}/{len(attr_fields)} fields")
     return ("skipped", f"attribute: {len(unmatched)} unmatched, 0 filled")
 
 
-def _write_pending_attr(category, sub_category, unmatched, param_map, product_name):
+def _write_pending_attr(category, sub_category, unmatched, param_map, product_name, capability_groups=None):
     """未匹配属性字段写入 pending_mappings.json"""
     # 已知无源数据的字段, 不写入pending (不浪费LLM token)
     SKIP_FIELDS = {'文字详情', '3C认证证书编号'}
@@ -919,6 +937,7 @@ def _write_pending_attr(category, sub_category, unmatched, param_map, product_na
             "select_opts": u.get('select_opts', []),
             "source_keys": list(param_map.keys()),  # 步骤1 LLM: 属性名匹配
             "params": param_map,  # 步骤2 LLM: 子选项值匹配 (拿到 source_key 后取 params[key])
+            "capability_groups": capability_groups or [],  # 能力名称/数值/单位 分组, 保留多组关联关系
             "created_at": time.strftime('%Y-%m-%dT%H:%M:%S'),
             "resolved": False
         }
@@ -1209,27 +1228,35 @@ def _fill_images(target, field_map, task):
     # === Step 4: 等待上传完成 ===
     if uploaded > 0:
         print(f"  [{label}] polling for {uploaded} upload results...", file=sys.stderr)
-        end = time.time() + 60; attempt = 0
+        end = time.time() + 30; attempt = 0
+        last_done = -1
+        last_failed = -1
         while time.time() < end:
             poll = _raw_iframe_eval(target,
                 "var vu=document.querySelector('.product-picture-add');"
                 "if(!vu||!vu.__vue__)return'{err:\"NO_VUE\"}';"
                 "var vs=vu.__vue__.valueSelf||[];"
-                "var done=0, urls=[];"
-                "for(var i=0;i<vs.length;i++){if(vs[i].src&&vs[i].src.length>10&&!vs[i].poor){done++;urls.push(vs[i].src);}}"
-                "return JSON.stringify({done:done,total:vs.length,urls:urls})")
+                "var done=0, failed=0, urls=[];"
+                "for(var i=0;i<vs.length;i++){"
+                "  if(vs[i].poor)continue;"
+                "  if(vs[i].src&&vs[i].src.length>10){done++;urls.push(vs[i].src);}"
+                "  else failed++;}"
+                "return JSON.stringify({done:done,failed:failed,total:vs.length,urls:urls})")
             try: poll_data = json.loads(poll) if poll else {}
             except: poll_data = {}
             completed = poll_data.get('done', 0)
-            print(f"  [{label}]  poll: {completed}/{poll_data.get('total',0)} vs-items done", file=sys.stderr)
-            if completed >= uploaded:
+            failed = poll_data.get('failed', 0)
+            if completed != last_done or failed != last_failed:
+                last_done, last_failed = completed, failed
+                print(f"  [{label}]  poll: {completed}/{poll_data.get('total',0)} vs-items done (failed: {failed})", file=sys.stderr)
+            if completed + failed >= uploaded:
                 uploaded_srcs = poll_data.get('urls', []); break
             time.sleep(0.5 if attempt < 8 else 1.0); attempt += 1
         else:
             poll2 = _raw_iframe_eval(target,
                 "var vu=document.querySelector('.product-picture-add');if(!vu||!vu.__vue__)return'[]';"
                 "var vs=vu.__vue__.valueSelf||[];var urls=[];"
-                "for(var i=0;i<vs.length;i++){if(vs[i].src&&vs[i].src.length>10)urls.push(vs[i].src);}"
+                "for(var i=0;i<vs.length;i++){if(vs[i].src&&vs[i].src.length>10&&!vs[i].poor)urls.push(vs[i].src);}"
                 "return JSON.stringify(urls)")
             try: uploaded_srcs = json.loads(poll2) if poll2 else []
             except: uploaded_srcs = []

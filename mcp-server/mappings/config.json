@@ -2,7 +2,7 @@
   "max_tasks": 5,
   "llm": {
     "api_url": "https://v2.aicodee.com/v1/chat/completions",
-    "api_key": "sk-0d9112932aa68eebb137722ee8e3882b",
+    "api_key": "",
     "model_id": "MiniMax-M2.7-highspeed"
   },
   "python": "python",

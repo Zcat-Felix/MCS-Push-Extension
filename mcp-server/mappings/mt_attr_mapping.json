@@ -208,7 +208,7 @@
         "": {
           "mappings": [
             {
-              "source_key": "能力名称",
+              "source_key": "能力数值",
               "form_label": "火力大小（KW）",
               "field_type": "text"
             },
@@ -320,6 +320,53 @@
               "source_key": "能力数值",
               "form_label": "水箱容量（L）",
               "field_type": "structured"
+            }
+          ]
+        }
+      }
+    },
+    "油烟机": {
+      "sub_category_field": "",
+      "default_sub": "",
+      "subcategories": {
+        "": {
+          "mappings": [
+            {
+              "source_key": "工作风量",
+              "form_label": "排风量（m³/min）",
+              "field_type": "text"
+            },
+            {
+              "source_key": "工作噪声",
+              "form_label": "声压级噪音（dB)",
+              "field_type": "text"
+            },
+            {
+              "source_key": "吸烟方式",
+              "form_label": "烟机款式",
+              "field_type": "select",
+              "value_map": {
+                "侧吸式": "侧吸式"
+              },
+              "default": "侧吸式"
+            },
+            {
+              "source_key": "能效等级",
+              "form_label": "能效等级",
+              "field_type": "select",
+              "value_map": {
+                "1级": "一级能效"
+              },
+              "default": "一级能效"
+            },
+            {
+              "source_key": "烟灶联动",
+              "form_label": "功能",
+              "field_type": "select",
+              "value_map": {
+                "有": "烟灶联动"
+              },
+              "default": "烟灶联动"
             }
           ]
         }
